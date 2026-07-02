@@ -26,7 +26,7 @@ export default function App() {
 
       />
       <HabitForm />
-      <HabitList />
+      <HabitList visibleDates={visibleDates}/>
       </HabitProvider>
     </div>
   )

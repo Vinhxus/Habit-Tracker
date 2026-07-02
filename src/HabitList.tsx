@@ -2,9 +2,14 @@ import Button from "./component/Button"
 import { startOfWeek, endOfWeek, eachDayOfInterval } from "date-fns"
 import { format, isSameDay , isFuture, subDays} from "date-fns"
 import { useHabits, type Habit } from "./context/useHabits"
+import { useState } from "react"
 
 
-export function HabitList() {
+type HabitListProps = {
+    visibleDates : Date[]
+}
+
+export function HabitList({visibleDates} : HabitListProps) {
     const {habits} = useHabits()
     if (habits.length === 0){
         return(
@@ -15,7 +20,7 @@ export function HabitList() {
     return (
         <div className="flex flex-col gap-3 text-blue-300">
             {habits.map(habit => (
-                <HabitItem key={habit.id} habit={habit} />
+                <HabitItem visibleDates={visibleDates} key={habit.id} habit={habit} />
             ))}
         </div>
     )
@@ -23,17 +28,13 @@ export function HabitList() {
 
 type HabitItemProps = {
     habit: Habit
+    visibleDates : Date[]
 }
 
-function HabitItem({ habit }: HabitItemProps) {
+function HabitItem({ habit, visibleDates }: HabitItemProps) {
     const {delHabit, toggleHabit} = useHabits()
-
-    const visibleDates = eachDayOfInterval({
-        start: startOfWeek(new Date(), { weekStartsOn: 1 }), // weekStartsOn: 1 nghĩa là Thứ Hai
-        end: endOfWeek(new Date(), { weekStartsOn: 1 }),
-    })
-
     const streak = countStreak(habit.completions)
+
     return (
         <div className="rounded-2xl bg-zinc-800 p-4 flex flex-col gap-2.5 border-2 border-zinc-700">
             <div className="flex justify-between items-center"> 
@@ -65,7 +66,6 @@ function HabitItem({ habit }: HabitItemProps) {
                         variant = {habit.completions.some(d => isSameDay(date,d)) ? 
                             "primary" : "secondary"
                         }
-
                     >
                         <span className="font-medium text-xs text-zinc-400"> {format(date, "EEE")} </span>
                         <span className="text-base font-bold text-white"> {format(date, "d")}</span>
